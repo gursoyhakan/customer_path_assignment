@@ -98,7 +98,7 @@ class Optimization:
     debts = []
     CLV = []
     action_costs = []
-    action_constraints = []
+    action_constraints = {}
     reading_time = 0
     status = gp.GRB.INFEASIBLE
     log_to_console = 1
@@ -146,7 +146,7 @@ class Optimization:
                     gp.quicksum(gp.quicksum(cust_path_bin[k, t] *
                                             1 for t in range(self.num_paths[k]) if self.paths[k][t][i] == j)
                                 for k in range(self.num_people))
-                    <= self.action_constraints[i, j])
+                    <= self.action_constraints[i,j])
         # objective function
         self.m.setObjective(non_payment_cost+churn_cost+action_cost, gp.GRB.MINIMIZE)
 
@@ -155,7 +155,10 @@ class Optimization:
         optimization_time = time.time() - self.reading_time
         if self.m.STATUS == gp.GRB.OPTIMAL:
             self.status = gp.GRB.OPTIMAL
-            return self.status, self.m.ObjVal, cust_path_bin, optimization_time
+            cust_path_bin_new = {}
+            for customer, path in cust_path_bin.keys():
+                cust_path_bin_new[customer, path] = cust_path_bin[customer, path].x
+            return self.status, self.m.ObjVal, cust_path_bin_new, optimization_time
         else:
             self.status = self.m.STATUS
             return self.status, None, None, optimization_time
@@ -178,7 +181,7 @@ class Optimization:
             for action in range(1, self.num_actions + 1):
                 used_actions[day, action] = 0
         for customer, path in cust_path_bin.keys():
-            if path == 1:
+            if cust_path_bin[customer, path] == 1:
                 selected_path = self.paths[customer][path]
                 for i in range(len(selected_path)-2):
                     used_actions[i + 1, selected_path[i]] += 1
