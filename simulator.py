@@ -4,7 +4,7 @@ import random
 import time
 import gurobipy as gp
 from linear_programming import FileOperations, Optimization
-input_file = "deneme2_input.txt"
+input_file = "deneme3_input.txt"
 number_of_simulations = 2
 simulation_customer_number = 600
 static_ratio = 0.1
