@@ -60,7 +60,7 @@ class FileOperations:
             paths.append(person_paths)
         f.close()
         self.reading_time = time.time()
-        print(f'Reading OK in {self.reading_time-self.start_time} seconds')
+        print(f'Reading OK in {(self.reading_time-self.start_time):.2f} seconds')
         return num_day, num_actions, num_people, num_paths, paths, debts, CLV, action_costs, action_constraints, self.reading_time
 
     def write_to_file(self, output_file):
@@ -177,7 +177,7 @@ class Optimization:
 
     def action_number_render(self, cust_path_bin):
         used_actions = {}
-        for day in range(1, self.num_day + 1):
+        for day in range(1,self.num_day + 2):
             for action in range(1, self.num_actions + 1):
                 used_actions[day, action] = 0
         for customer, path in cust_path_bin.keys():
