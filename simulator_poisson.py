@@ -4,9 +4,10 @@ import copy
 import random
 import time
 import gurobipy as gp
+import numpy as np
 from linear_programming import FileOperations, Optimization
 input_file = "customers1000.txt"
-output_file = 'customers1000out.txt'
+output_file = '_poisson_customers1000out.txt'
 # Here we get the data by using FileOperations class
 reading = FileOperations()
 num_day, num_actions, num_people, num_paths, paths, debts, CLV, action_costs, base_action_constraints, reading_time = \
@@ -57,7 +58,7 @@ for action_rate in [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
     customer_exit_probability[0] = 0
     customer_exit_probability[1] = 0.2
     for i in range(2, 61):
-        customer_exit_probability[i] = min(1, customer_exit_probability[i-1] + (1-customer_exit_probability[i-1])/20)
+        customer_exit_probability[i] = 0.05
     for i in range(61, simulation_days):
         customer_exit_probability[i] = 1
 
@@ -131,7 +132,9 @@ for action_rate in [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3]:
             daily_customers[sim_day] = []
             exiting_customers[sim_day] = []
             dynamic_customer_list_len = len(dynamic_customer_list)
-            daily_average_dynamic_customers_selection_ratio = float(1/(simulation_days-sim_day))
+            poisson_mean = int(dynamic_customer_list_len/(simulation_days-sim_day))
+            poisson_num = np.random.poisson(poisson_mean)
+            daily_average_dynamic_customers_selection_ratio = float(poisson_num/dynamic_customer_list_len)
             for customer in dynamic_customer_list:
                 if random.random() <= daily_average_dynamic_customers_selection_ratio:
                     daily_customers[sim_day].append(customer)
